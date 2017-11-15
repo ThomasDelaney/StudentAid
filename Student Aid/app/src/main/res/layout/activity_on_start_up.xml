@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.example.teohe.studentaid.OnStartUpActivity">
+
+
+    <TextView
+        android:id="@+id/welcomeMessage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="15dp"
+        android:text="Welcome Student!"
+        android:textAlignment="center"
+        android:textColor="@color/niceBlue"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:typeface="monospace" />
+
+    <EditText
+        android:id="@+id/firstNameSetup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/welcomeMessage"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="37dp"
+        android:ems="13"
+        android:hint="Enter Your First Name"
+        android:inputType="textPersonName"
+        android:textAlignment="center" />
+
+    <EditText
+        android:id="@+id/lastNameSetup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignStart="@+id/firstNameSetup"
+        android:layout_below="@+id/firstNameSetup"
+        android:layout_marginTop="20dp"
+        android:ems="13"
+        android:hint="Enter Your Last Name"
+        android:inputType="textPersonName"
+        android:textAlignment="center" />
+
+    <EditText
+        android:id="@+id/collegeNameSetup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignStart="@+id/lastNameSetup"
+        android:layout_below="@+id/lastNameSetup"
+        android:layout_marginTop="18dp"
+        android:ems="13"
+        android:hint="Enter Your College Name"
+        android:inputType="textPersonName"
+        android:textAlignment="center"/>
+
+    <EditText
+        android:id="@+id/courseTitleSetup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignStart="@+id/collegeNameSetup"
+        android:layout_below="@+id/collegeNameSetup"
+        android:layout_marginTop="18dp"
+        android:ems="13"
+        android:hint="Enter Your Course Title"
+        android:inputType="textPersonName"
+        android:textAlignment="center"/>
+
+    <Button
+        android:id="@+id/imageButtonSetup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/courseTitleSetup"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="18dp"
+        android:text="Choose a Profile Image"
+        style="@style/Widget.AppCompat.Button.Colored"
+        android:backgroundTint="@color/accent"/>
+
+    <Button
+        android:id="@+id/submitButtonSetup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/imageButtonSetup"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="37dp"
+        android:text="Submit"
+        style="@style/Widget.AppCompat.Button.Colored"
+        android:backgroundTint="@color/niceBlue"/>
+</RelativeLayout>

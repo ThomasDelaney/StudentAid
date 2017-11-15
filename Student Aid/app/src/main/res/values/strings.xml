@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">Student Aid</string>
+
+    <string-array name="type_array">
+        <item>Lecture</item>
+        <item>Tutorial</item>
+        <item>Lab</item>
+    </string-array>
+    <string name="title_activity_home">HomeActivity</string>
+    <string name="title_home">Home</string>
+    <string name="title_calculator">CA Calculator</string>
+    <string name="title_timetables">Timetables</string>
+    <string name="title_food">Food Map</string>
+    <string name="title_notifications">Notifications</string>
+</resources>
