@@ -1,15 +1,24 @@
 package com.example.teohe.studentaid;
 
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
+import android.widget.ImageView;
 import android.widget.TextView;
 
-public class HomeActivity extends AppCompatActivity {
+public class HomeActivity extends AppCompatActivity
+{
+    DatabaseManager databaseManager;
 
-    private TextView mTextMessage;
+    TextView fullName;
+    TextView collegeName;
+    TextView courseTitle;
+    ImageView profileImageView;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener()
@@ -20,19 +29,17 @@ public class HomeActivity extends AppCompatActivity {
             switch (item.getItemId())
             {
                 case R.id.navigation_home:
-                    mTextMessage.setText(R.string.title_home);
                     return true;
                 case R.id.navigation_calculator:
-                    mTextMessage.setText(R.string.title_notifications);
+                    Intent toModuleListIntent = new Intent(HomeActivity.this, ModuleListActivity.class);
+                    startActivity(toModuleListIntent);
+                    finish();
                     return true;
                 case R.id.navigation_timetables:
-                    mTextMessage.setText(R.string.title_timetables);
                     return true;
                 case R.id.navigation_food:
-                    mTextMessage.setText(R.string.title_food);
                     return true;
                 case R.id.navigation_notifications:
-                    mTextMessage.setText(R.string.title_notifications);
                     return true;
             }
             return false;
@@ -40,11 +47,54 @@ public class HomeActivity extends AppCompatActivity {
     };
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
-        mTextMessage = (TextView) findViewById(R.id.message);
+        databaseManager = new DatabaseManager(getApplicationContext());
+
+        databaseManager.open();
+        Profile profile = databaseManager.getUser();
+        databaseManager.close();
+
+        int firstTimeLoginCheck = 0;
+
+        firstTimeLoginCheck = getIntent().getExtras().getInt("First Time on Home Page?");
+
+        if (firstTimeLoginCheck == 1)
+        {
+            AlertDialog.Builder builder = new AlertDialog.Builder(HomeActivity.this);
+            builder.setTitle("Welcome "+profile.getFirstName());
+            builder.setMessage("This is YOUR Student Aid App, You can create your own custom timetables," +
+                    " calculate CA, look for Food places and set personalised Notifications!");
+            builder.setPositiveButton("Let's Begin",
+                    new DialogInterface.OnClickListener()
+                    {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which)
+                        {
+                            dialog.cancel();
+                        }
+                    });
+
+            AlertDialog dialog = builder.create();
+            dialog.show();
+        }
+
+        fullName = (TextView)findViewById(R.id.studentName);
+        String fullNameStr = profile.getFirstName() + " " + profile.getLastName();
+        fullName.setText(fullNameStr);
+
+        collegeName = (TextView)findViewById(R.id.collegeName);
+        collegeName.setText(profile.getCollegeName());
+
+        courseTitle = (TextView)findViewById(R.id.courseTitle);
+        courseTitle.setText(profile.getCourseTitle());
+
+        profileImageView = (ImageView) findViewById(R.id.profileImage);
+        profileImageView.setImageBitmap(profile.getImage());
+
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
         navigation.setSelectedItemId(R.id.navigation_home);

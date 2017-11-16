@@ -12,4 +12,7 @@
     <string name="title_timetables">Timetables</string>
     <string name="title_food">Food Map</string>
     <string name="title_notifications">Notifications</string>
+    <string name="title_activity_module_list">ModuleListActivity</string>
+    <string name="title_dashboard">Dashboard</string>
+
 </resources>

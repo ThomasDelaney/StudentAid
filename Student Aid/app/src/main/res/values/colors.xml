@@ -7,4 +7,6 @@
     <color name="accent">#0C92CF</color>
     <color name="niceBlue">#0060AA</color>
     <color name="red">#FF0000</color>
+
+    <color name="black">#000000</color>
 </resources>

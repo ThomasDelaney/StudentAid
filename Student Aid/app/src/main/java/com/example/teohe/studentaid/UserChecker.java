@@ -1,6 +1,8 @@
 package com.example.teohe.studentaid;
 
+import android.content.Context;
 import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 
 /**
  * Created by TeoHe on 15/11/2017.
@@ -8,16 +10,22 @@ import android.content.SharedPreferences;
 
 public class UserChecker
 {
-    SharedPreferences currentPreferences;
+    //using shared preferences to see if user has already set up profile, this will be quicker then checking database
+    //for user profile
+    private SharedPreferences currentPreferences;
 
-    public Profile getUser()
+    public int getUser(Context context)
     {
-        Profile profile = null;
-        return profile;
+        currentPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+
+        return currentPreferences.getInt("logged", 0);
     }
 
-    public void setUser(Profile profile)
+    public void setUser(Context context)
     {
-
+        currentPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = currentPreferences.edit();
+        editor.putInt("logged", 1);
+        editor.apply();
     }
 }
