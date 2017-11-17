@@ -137,7 +137,7 @@ public class DatabaseManager
     }
 
     //get user that is logged in, if not logged in return null Profile
-    public Profile getUser() throws SQLException
+    public Profile getProfile() throws SQLException
     {
         Profile profile = null;
 
@@ -202,7 +202,7 @@ public class DatabaseManager
         return profile;
     }
 
-    public long setUser(String firstName, String lastName, String collegeName, String courseTitle, String imagePath) throws SQLException
+    public long setProfile(String firstName, String lastName, String collegeName, String courseTitle, String imagePath) throws SQLException
     {
         long returnValue = -1;
 
@@ -226,6 +226,63 @@ public class DatabaseManager
         return returnValue;
     }
 
+    public long insertModule(String moduleName, int worth) throws SQLException
+    {
+        long returnValue = -1;
+
+        try
+        {
+            ContentValues initialValues = new ContentValues();
+            initialValues.put(KEY_MODULE_NAME, moduleName);
+            initialValues.put(KEY_MODULE_WORTH, worth);
+
+            returnValue = db.insert(DATABASE_MODULE_TABLE, null, initialValues);
+        }
+        catch (SQLException e)
+        {
+            Log.e("SQLException", e.getMessage());
+        }
+
+        return returnValue;
+    }
+
+    public long updateModule(String originalModuleName, String newModuleName, int worth) throws SQLException
+    {
+        long returnValue = -1;
+        String moduleUpdate = "moduleName = "+"'"+originalModuleName+"'";
+        try
+        {
+            ContentValues initialValues = new ContentValues();
+            initialValues.put(KEY_MODULE_NAME, newModuleName);
+            initialValues.put(KEY_MODULE_WORTH, worth);
+
+            returnValue = db.update(DATABASE_MODULE_TABLE, initialValues, moduleUpdate, null);
+        }
+        catch (SQLException e)
+        {
+            Log.e("SQLException", e.getMessage());
+        }
+
+        return returnValue;
+    }
+
+    public long deleteModule(String moduleName) throws SQLException
+    {
+        long returnValue = -1;
+        String moduleDelete = "moduleName = "+"'"+moduleName+"'";
+
+        try
+        {
+            returnValue = db.delete(DATABASE_MODULE_TABLE, moduleDelete, new String[]{});
+        }
+        catch (SQLException e)
+        {
+            Log.e("SQLException", e.getMessage());
+        }
+
+        return returnValue;
+    }
+
     public Cursor getModules()
     {
         return db.query(true, DATABASE_MODULE_TABLE, new String[]
@@ -234,6 +291,18 @@ public class DatabaseManager
                                 KEY_MODULE_WORTH
                         },
                  null,  null, null, null, null, null);
+    }
+
+    public Cursor getModule(String moduleName)
+    {
+        String moduleSelect = "moduleName = "+"'"+moduleName+"'";
+
+        return db.query(true, DATABASE_MODULE_TABLE, new String[]
+                        {
+                                KEY_MODULE_NAME,
+                                KEY_MODULE_WORTH
+                        },
+                moduleSelect,  null, null, null, null, null);
     }
 
     // Reference: algorithm for getting file path from URI

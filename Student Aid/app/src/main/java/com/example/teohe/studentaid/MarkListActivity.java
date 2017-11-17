@@ -1,37 +1,28 @@
 package com.example.teohe.studentaid;
 
-import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.database.Cursor;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 
-public class ModuleListActivity extends AppCompatActivity
+/**
+ * Created by Thomas on 17/11/2017.
+ */
+
+public class MarkListActivity extends AppCompatActivity
 {
     //for editing toolbar images at runtime
     Menu toolbarMenu;
 
-    ArrayList<Module> modules;
+    String moduleName;
+    ArrayList<Mark> marks;
     DatabaseManager databaseManager;
-    ListView moduleListView;
+    ListView markListView;
 
     //mode for what to do when modules are clicked
     //0 if default mode (click to see marks)
@@ -39,84 +30,41 @@ public class ModuleListActivity extends AppCompatActivity
     //2 if delete mode (2 to delete)
     int mode = 0;
 
-    private class ModuleAdapter extends ArrayAdapter<Module>
-    {
-        private ModuleAdapter(Context context, int rowLayoutId, ArrayList<Module> myArrayData)
-        {
-            super(context, rowLayoutId, myArrayData);
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent)
-        {
-            View row = convertView;
-
-            if (row == null)
-            {
-                LayoutInflater inflater = getLayoutInflater();
-                row = inflater.inflate(R.layout.module_row, parent, false);
-            }
-
-            TextView moduleName = (TextView) row.findViewById(R.id.moduleNameRow);
-            TextView moduleWorth = (TextView) row.findViewById(R.id.moduleWorthRow);
-
-            Module currentModule = modules.get(position);
-            String moduleWorthStr;
-
-            moduleName.setText(currentModule.getModuleName());
-
-            if (currentModule.getModuleWorth() == 101)
-            {
-                moduleWorthStr = "";
-            }
-            else
-            {
-                moduleWorthStr = Integer.toString(100 - currentModule.getModuleWorth()) + "/" + currentModule.getModuleWorth();
-            }
-
-            moduleWorth.setText(moduleWorthStr);
-
-            return row;
-        }
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_module_list);
+        setContentView(R.layout.activity_mark_list);
 
-        BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
-        navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
-        navigation.setSelectedItemId(R.id.navigation_calculator);
+        moduleName = getIntent().getExtras().getString("moduleName");
 
         ActionBar actionBar = getSupportActionBar();
-        actionBar.setTitle("CA Calculator");
+        actionBar.setTitle(moduleName);
         actionBar.show();
 
-        moduleListView = (ListView)findViewById(R.id.moduleList);
+        markListView = (ListView)findViewById(R.id.markList);
 
         databaseManager = new DatabaseManager(getApplicationContext());
 
-        modules = new ArrayList<Module>();
+        marks = new ArrayList<Mark>();
 
-        databaseManager.open();
-        Cursor moduleCursor = databaseManager.getModules();
+        /*databaseManager.open();
+        Cursor markCursor = databaseManager.getMarks(moduleName);
 
         //check if list is empty
-        populateModulesFromCursor(moduleCursor);
+        populateMarksFromCursor(markCursor);
         databaseManager.close();
 
-        if (modules.isEmpty())
+        if (marks.isEmpty())
         {
             //add CA as 101, which will be no way enterable by the user cause 100 will be the max, this is used to make the worth column text view empty
             Module temp = new Module("Your Module List is Empty! Click the Add Button to Add Some Modules", 101);
-            modules.add(temp);
-            moduleListView.setAdapter(new ModuleAdapter (ModuleListActivity.this, R.layout.module_row, modules));
+            marks.add(temp);
+            markListView.setAdapter(new ModuleListActivity.ModuleAdapter(ModuleListActivity.this, R.layout.module_row, modules));
         }
         else
         {
-            moduleListView.setAdapter(new ModuleAdapter(ModuleListActivity.this, R.layout.module_row, modules));
+            moduleListView.setAdapter(new ModuleListActivity.ModuleAdapter(ModuleListActivity.this, R.layout.module_row, modules));
         }
 
 
@@ -181,6 +129,9 @@ public class ModuleListActivity extends AppCompatActivity
                     areYouSure.setPositiveButton("Yes",
                             new DialogInterface.OnClickListener()
                             {
+                                //since we're using inner class, need to get position and sore in local variable for onClick, or it will ask for final int
+                                int rowPosition = position;
+
                                 @Override
                                 public void onClick(DialogInterface dialog, int which)
                                 {
@@ -204,14 +155,8 @@ public class ModuleListActivity extends AppCompatActivity
                     AlertDialog dialog = areYouSure.create();
                     dialog.show();
                 }
-                else
-                {
-                    Intent toMarkList = new Intent(ModuleListActivity.this, MarkListActivity.class);
-                    toMarkList.putExtra("moduleName", modules.get(position).getModuleName());
-                    startActivity(toMarkList);
-                }
             }
-        });
+        });*/
     }
 
     @Override
@@ -230,9 +175,6 @@ public class ModuleListActivity extends AppCompatActivity
         {
             // action with ID action_refresh was selected
             case R.id.menu_add:
-                Intent toAddModule = new Intent(ModuleListActivity.this, SubmitModuleActivity.class);
-                toAddModule.putExtra("type", 1);
-                startActivity(toAddModule);
                 break;
             case R.id.menu_edit:
                 //to change icon colours based on modes, while also changing modes
@@ -268,41 +210,14 @@ public class ModuleListActivity extends AppCompatActivity
         return true;
     }
 
-    private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
-            = new BottomNavigationView.OnNavigationItemSelectedListener()
-    {
-        @Override
-        public boolean onNavigationItemSelected(@NonNull MenuItem item)
-        {
-            switch (item.getItemId())
-            {
-                case R.id.navigation_home:
-                    Intent toHomeIntent = new Intent(ModuleListActivity.this, HomeActivity.class);
-                    toHomeIntent.putExtra("First Time on Home Page?", 0);
-                    startActivity(toHomeIntent);
-                    finish();
-                    return true;
-                case R.id.navigation_calculator:
-                    return true;
-                case R.id.navigation_timetables:
-                    return true;
-                case R.id.navigation_food:
-                    return true;
-                case R.id.navigation_notifications:
-                    return true;
-            }
-            return false;
-        }
-    };
-
-    public void populateModulesFromCursor(Cursor c)
+    /*public void populateMarksFromCursor(Cursor c)
     {
         while(c.moveToNext())
         {
-            Module module = new Module(c.getString(0), c.getInt(1));
-            modules.add(module);
+            Mark mark = new Mark(c.getString(0), c.getFloat(1), c.getFloat(2));
+            marks.add(mark);
         }
-    }
+    }*/
 
     @Override
     protected void onRestart()

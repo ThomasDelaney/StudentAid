@@ -23,6 +23,8 @@
         <activity
             android:name=".ModuleListActivity"
             android:label="@string/title_activity_module_list" />
+        <activity android:name=".SubmitModuleActivity"></activity>
+        <activity android:name=".MarkListActivity" />
     </application>
 
 </manifest>

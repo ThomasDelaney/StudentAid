@@ -15,7 +15,8 @@
         android:textColor="@color/black"
         android:textSize="20sp"
         android:fontFamily="casual"
-        android:textStyle="bold"/>
+        android:textStyle="bold"
+        android:maxEms="8" />
 
     <TextView
         android:id="@+id/moduleWorthRow"
@@ -30,5 +31,5 @@
         android:textColor="@color/black"
         android:textSize="20sp"
         android:fontFamily="casual"
-        android:textStyle="bold"/>
+        android:textStyle="bold" />
 </RelativeLayout>

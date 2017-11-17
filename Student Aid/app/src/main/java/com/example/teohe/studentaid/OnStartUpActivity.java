@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -30,8 +29,12 @@ public class OnStartUpActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState)
     {
         //getApplicationContext().deleteDatabase("StudentAid");
+        //SharedPreferences currentPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        //SharedPreferences.Editor editor = currentPreferences.edit();
+        //editor.clear();
+        //editor.apply();
 
-        Log.e("boi", Integer.toString(userChecker.getUser(getApplicationContext())));
+        //Log.e("Is Logged In?", Integer.toString(userChecker.getUser(getApplicationContext())));
 
         if (userChecker.getUser(getApplicationContext()) == 1)
         {
@@ -77,7 +80,7 @@ public class OnStartUpActivity extends AppCompatActivity
                 {
 
                     databaseManager.open();
-                    databaseManager.setUser(firstName.getText().toString(), lastName.getText().toString(), collegeName.getText().toString(), courseTitle.getText().toString(), imagePath);
+                    databaseManager.setProfile(firstName.getText().toString(), lastName.getText().toString(), collegeName.getText().toString(), courseTitle.getText().toString(), imagePath);
                     databaseManager.close();
 
                     userChecker.setUser(getApplicationContext());

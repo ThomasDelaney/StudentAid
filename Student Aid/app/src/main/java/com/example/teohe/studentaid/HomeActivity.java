@@ -55,7 +55,7 @@ public class HomeActivity extends AppCompatActivity
         databaseManager = new DatabaseManager(getApplicationContext());
 
         databaseManager.open();
-        Profile profile = databaseManager.getUser();
+        Profile profile = databaseManager.getProfile();
         databaseManager.close();
 
         int firstTimeLoginCheck = 0;
