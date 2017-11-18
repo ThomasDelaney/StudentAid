@@ -305,6 +305,80 @@ public class DatabaseManager
                 moduleSelect,  null, null, null, null, null);
     }
 
+    public long insertMark(String moduleName, String markName, int worth, int score) throws SQLException
+    {
+        long returnValue = -1;
+
+        try
+        {
+            ContentValues initialValues = new ContentValues();
+            initialValues.put(KEY_MARK_NAME, markName);
+            initialValues.put(KEY_MARK_WORTH, worth);
+            initialValues.put(KEY_MARK_SCORE, score);
+            initialValues.put(KEY_MODULE_NAME, moduleName);
+
+                returnValue = db.insert(DATABASE_MARK_TABLE, null, initialValues);
+        }
+        catch (SQLException e)
+        {
+            Log.e("SQLException", e.getMessage());
+        }
+
+        return returnValue;
+    }
+
+    public long updateMark(String originalMarkName, String newMarkName, int worth, int score) throws SQLException
+    {
+        long returnValue = -1;
+        String markUpdate = "markName = "+"'"+originalMarkName+"'";
+        try
+        {
+            ContentValues initialValues = new ContentValues();
+            initialValues.put(KEY_MARK_NAME, newMarkName);
+            initialValues.put(KEY_MARK_WORTH, worth);
+            initialValues.put(KEY_MARK_SCORE, score);
+
+            returnValue = db.update(DATABASE_MARK_TABLE, initialValues, markUpdate, null);
+        }
+        catch (SQLException e)
+        {
+            Log.e("SQLException", e.getMessage());
+        }
+
+        return returnValue;
+    }
+
+    public long deleteMark(String markName) throws SQLException
+    {
+        long returnValue = -1;
+        String markDelete = "markName = "+"'"+markName+"'";
+
+        try
+        {
+            returnValue = db.delete(DATABASE_MARK_TABLE, markDelete, new String[]{});
+        }
+        catch (SQLException e)
+        {
+            Log.e("SQLException", e.getMessage());
+        }
+
+        return returnValue;
+    }
+
+    public Cursor getMarks(String moduleName)
+    {
+        long returnValue = -1;
+        String marksGet = "moduleName = "+"'"+moduleName+"'";
+
+        return db.query(true, DATABASE_MARK_TABLE, new String[]
+                        {
+                                KEY_MARK_NAME,
+                                KEY_MARK_WORTH,
+                                KEY_MARK_SCORE
+                        },
+                marksGet,  null, null, null, null, null);
+    }
+
     // Reference: algorithm for getting file path from URI
     //https://stackoverflow.com/questions/3401579/get-filename-and-path-from-uri-from-mediastore
     public String getRealPathFromURI(Context context, Uri contentUri)

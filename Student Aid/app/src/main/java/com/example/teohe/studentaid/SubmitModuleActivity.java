@@ -29,10 +29,10 @@ public class SubmitModuleActivity extends AppCompatActivity
         type = getIntent().getExtras().getInt("type");
 
         databaseManager = new DatabaseManager(getApplication());
-        moduleName = (EditText) findViewById(R.id.moduleNameSubmitAdd);
-        worthBar = (SeekBar)findViewById(R.id.seekBar);
+        moduleName = (EditText) findViewById(R.id.moduleNameSubmit);
+        worthBar = (SeekBar)findViewById(R.id.seekBarModule);
         worthView = (TextView)findViewById(R.id.seekBarWorth);
-        submitButton = (Button)findViewById(R.id.submitModuleButtonAdd);
+        submitButton = (Button)findViewById(R.id.submitModuleButton);
 
         worthView.setText(worthBar.getProgress()+"/"+worthBar.getMax()+"% going towards Continuous Assessment");
 

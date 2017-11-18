@@ -1,12 +1,24 @@
 package com.example.teohe.studentaid;
 
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -23,12 +35,54 @@ public class MarkListActivity extends AppCompatActivity
     ArrayList<Mark> marks;
     DatabaseManager databaseManager;
     ListView markListView;
+    Module module;
 
     //mode for what to do when modules are clicked
     //0 if default mode (click to see marks)
     //1 if edit mode (click to edit)
     //2 if delete mode (2 to delete)
     int mode = 0;
+
+    private class MarkAdapter extends ArrayAdapter<Mark>
+    {
+        private MarkAdapter(Context context, int rowLayoutId, ArrayList<Mark> myArrayData)
+        {
+            super(context, rowLayoutId, myArrayData);
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent)
+        {
+            View row = convertView;
+
+            if (row == null)
+            {
+                LayoutInflater inflater = getLayoutInflater();
+                row = inflater.inflate(R.layout.mark_row, parent, false);
+            }
+
+            TextView markName = (TextView) row.findViewById(R.id.markNameRow);
+            TextView markWorth = (TextView) row.findViewById(R.id.markWorthRow);
+            TextView markScore = (TextView) row.findViewById(R.id.markScoreRow);
+
+            Mark currentMark = marks.get(position);
+
+            markName.setText(currentMark.getMarkName());
+
+            if (currentMark.getMarkWorth() == 101)
+            {
+                markWorth.setText("");
+                markScore.setText("");
+            }
+            else
+            {
+                markWorth.setText(Integer.toString(currentMark.getMarkWorth())+"%");
+                markScore.setText(Integer.toString(currentMark.getMarkScore())+"%");
+            }
+
+            return row;
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -48,8 +102,18 @@ public class MarkListActivity extends AppCompatActivity
 
         marks = new ArrayList<Mark>();
 
-        /*databaseManager.open();
+        databaseManager.open();
         Cursor markCursor = databaseManager.getMarks(moduleName);
+        Cursor moduleCursor = databaseManager.getModule(moduleName);
+
+        if (moduleCursor.moveToNext())
+        {
+            module = new Module(moduleName, moduleCursor.getInt(1));
+        }
+        else
+        {
+            module = null;
+        }
 
         //check if list is empty
         populateMarksFromCursor(markCursor);
@@ -58,17 +122,17 @@ public class MarkListActivity extends AppCompatActivity
         if (marks.isEmpty())
         {
             //add CA as 101, which will be no way enterable by the user cause 100 will be the max, this is used to make the worth column text view empty
-            Module temp = new Module("Your Module List is Empty! Click the Add Button to Add Some Modules", 101);
+            Mark temp = new Mark(module, "Your Mark List is Empty! Click the Add Button to Add Some Marks", 101, 101);
             marks.add(temp);
-            markListView.setAdapter(new ModuleListActivity.ModuleAdapter(ModuleListActivity.this, R.layout.module_row, modules));
+            markListView.setAdapter(new MarkListActivity.MarkAdapter(MarkListActivity.this, R.layout.mark_row, marks));
         }
         else
         {
-            moduleListView.setAdapter(new ModuleListActivity.ModuleAdapter(ModuleListActivity.this, R.layout.module_row, modules));
+            markListView.setAdapter(new MarkListActivity.MarkAdapter(MarkListActivity.this, R.layout.mark_row, marks));
         }
 
 
-        moduleListView.setOnItemClickListener(new AdapterView.OnItemClickListener()
+        markListView.setOnItemClickListener(new AdapterView.OnItemClickListener()
         {
             @Override
             public void onItemClick(AdapterView<?> parent, final View view, final int position, long id)
@@ -76,9 +140,9 @@ public class MarkListActivity extends AppCompatActivity
                 //if delete mode
                 if (mode == 2)
                 {
-                    AlertDialog.Builder areYouSure = new AlertDialog.Builder(ModuleListActivity.this);
-                    areYouSure.setTitle("Are You Sure You Want to Delete This Module?");
-                    areYouSure.setMessage(modules.get(position).getModuleName());
+                    AlertDialog.Builder areYouSure = new AlertDialog.Builder(MarkListActivity.this);
+                    areYouSure.setTitle("Are You Sure You Want to Delete This Mark?");
+                    areYouSure.setMessage(marks.get(position).getMarkName());
 
                     areYouSure.setPositiveButton("Yes",
                             new DialogInterface.OnClickListener()
@@ -90,7 +154,7 @@ public class MarkListActivity extends AppCompatActivity
                                 public void onClick(DialogInterface dialog, int which)
                                 {
                                     databaseManager.open();
-                                    long deleteResult = databaseManager.deleteModule(modules.get(rowPosition).getModuleName());
+                                    long deleteResult = databaseManager.deleteMark(marks.get(rowPosition).getMarkName());
                                     databaseManager.close();
 
                                     dialog.cancel();
@@ -122,9 +186,9 @@ public class MarkListActivity extends AppCompatActivity
                 //if edit mode
                 else if (mode == 1)
                 {
-                    AlertDialog.Builder areYouSure = new AlertDialog.Builder(ModuleListActivity.this);
-                    areYouSure.setTitle("Are You Sure You Want to Edit This Module?");
-                    areYouSure.setMessage(modules.get(position).getModuleName());
+                    AlertDialog.Builder areYouSure = new AlertDialog.Builder(MarkListActivity.this);
+                    areYouSure.setTitle("Are You Sure You Want to Edit This Mark?");
+                    areYouSure.setMessage(marks.get(position).getMarkName());
 
                     areYouSure.setPositiveButton("Yes",
                             new DialogInterface.OnClickListener()
@@ -135,10 +199,12 @@ public class MarkListActivity extends AppCompatActivity
                                 @Override
                                 public void onClick(DialogInterface dialog, int which)
                                 {
-                                    Intent toUpdateModuleIntent = new Intent(ModuleListActivity.this, SubmitModuleActivity.class);
-                                    toUpdateModuleIntent.putExtra("type", 2);
-                                    toUpdateModuleIntent.putExtra("moduleName", modules.get(position).getModuleName());
-                                    startActivity(toUpdateModuleIntent);
+                                    Intent toUpdateMarkIntent = new Intent(MarkListActivity.this, SubmitMarkActivity.class);
+                                    toUpdateMarkIntent.putExtra("type", 2);
+                                    toUpdateMarkIntent.putExtra("markName", marks.get(position).getMarkName());
+                                    toUpdateMarkIntent.putExtra("moduleName", marks.get(position).getMarkModuleName());
+                                    toUpdateMarkIntent.putExtra("moduleWorth", getRemainingCA()+marks.get(position).getMarkWorth());
+                                    startActivity(toUpdateMarkIntent);
                                 }
                             });
 
@@ -156,7 +222,7 @@ public class MarkListActivity extends AppCompatActivity
                     dialog.show();
                 }
             }
-        });*/
+        });
     }
 
     @Override
@@ -175,6 +241,11 @@ public class MarkListActivity extends AppCompatActivity
         {
             // action with ID action_refresh was selected
             case R.id.menu_add:
+                Intent toAddMark = new Intent(MarkListActivity.this, SubmitMarkActivity.class);
+                toAddMark.putExtra("type", 1);
+                toAddMark.putExtra("moduleName", moduleName);
+                toAddMark.putExtra("moduleWorth", getRemainingCA());
+                startActivity(toAddMark);
                 break;
             case R.id.menu_edit:
                 //to change icon colours based on modes, while also changing modes
@@ -210,14 +281,14 @@ public class MarkListActivity extends AppCompatActivity
         return true;
     }
 
-    /*public void populateMarksFromCursor(Cursor c)
+    public void populateMarksFromCursor(Cursor c)
     {
         while(c.moveToNext())
         {
-            Mark mark = new Mark(c.getString(0), c.getFloat(1), c.getFloat(2));
+            Mark mark = new Mark(module, c.getString(0), c.getInt(1), c.getInt(2));
             marks.add(mark);
         }
-    }*/
+    }
 
     @Override
     protected void onRestart()
@@ -225,5 +296,21 @@ public class MarkListActivity extends AppCompatActivity
         super.onRestart();
         //will reload the activity
         recreate();
+    }
+
+    private int getRemainingCA()
+    {
+        int remainingCA = module.getModuleWorth();
+
+        for (Mark mark : marks)
+        {
+            if (mark.getMarkWorth() == 101)
+            {
+                continue;
+            }
+            remainingCA -= mark.getMarkWorth();
+        }
+
+        return remainingCA;
     }
 }

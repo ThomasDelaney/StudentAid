@@ -8,10 +8,10 @@ public class Mark
 {
     private Module module;
     private String markName;
-    private float markWorth;
-    private float markScore;
+    private int markWorth;
+    private int markScore;
 
-    public Mark(Module module, String markName, float markWorth, float markScore)
+    public Mark(Module module, String markName, int markWorth, int markScore)
     {
         this.module = module;
         this.markName = markName;
@@ -35,24 +35,29 @@ public class Mark
         this.markName = markName;
     }
 
-    public float getMarkWorth() {
+    public int getMarkWorth() {
         return markWorth;
     }
 
-    public void setMarkWorth(float markWorth) {
+    public void setMarkWorth(int markWorth) {
         this.markWorth = markWorth;
     }
 
-    public float getMarkScore() {
+    public int getMarkScore() {
         return markScore;
     }
 
-    public void setMarkScore(float markScore) {
+    public void setMarkScore(int markScore) {
         this.markScore = markScore;
     }
 
     public String getMarkModuleName()
     {
         return getModule().getModuleName();
+    }
+
+    public int getMarkModuleWorth()
+    {
+        return getModule().getModuleWorth();
     }
 }

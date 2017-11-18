@@ -4,16 +4,17 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.teohe.studentaid.SubmitModuleActivity">
+    tools:context="com.example.teohe.studentaid.SubmitMarkActivity">
+
 
     <TextView
-        android:id="@+id/submitModuleTitle"
+        android:id="@+id/submitMarkTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="16dp"
-        android:text="Submit a Module"
+        android:text="Submit a Mark"
         android:textAlignment="center"
         android:textColor="@color/niceBlue"
         android:textSize="20sp"
@@ -25,22 +26,22 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <EditText
-        android:id="@+id/moduleNameSubmit"
+        android:id="@+id/markNameSubmit"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="112dp"
         android:ems="10"
-        android:hint="Enter Module Name"
+        android:hint="Enter Mark Name"
         android:inputType="textPersonName"
         app:layout_constraintEnd_toEndOf="parent"
         android:maxLength="50"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/submitModuleTitle" />
+        app:layout_constraintTop_toBottomOf="@+id/submitMarkTitle" />
 
     <SeekBar
-        android:id="@+id/seekBarModule"
+        android:id="@+id/seekBarMarkWorth"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="56dp"
@@ -48,10 +49,10 @@
         android:progress="50"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/moduleNameSubmit" />
+        app:layout_constraintTop_toBottomOf="@+id/markNameSubmit" />
 
     <TextView
-        android:id="@+id/seekBarWorth"
+        android:id="@+id/seekBarWorthMarkView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
@@ -64,17 +65,44 @@
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/seekBarModule" />
+        app:layout_constraintTop_toBottomOf="@+id/seekBarMarkWorth" />
+
+    <SeekBar
+        android:id="@+id/seekBarMarkScore"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="56dp"
+        android:progress="50"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/seekBarWorthMarkView" />
+
+    <TextView
+        android:id="@+id/seekBarScoreMarkView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:text="Score"
+        android:textAlignment="center"
+        android:textColor="@color/accent"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/seekBarMarkScore" />
 
     <Button
-        android:id="@+id/submitModuleButton"
+        android:id="@+id/submitMarkButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Submit"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/seekBarModule"
+        app:layout_constraintTop_toBottomOf="@+id/seekBarScoreMarkView"
         style="@style/Widget.AppCompat.Button.Colored"
         android:backgroundTint="@color/niceBlue"/>
+
 </android.support.constraint.ConstraintLayout>
