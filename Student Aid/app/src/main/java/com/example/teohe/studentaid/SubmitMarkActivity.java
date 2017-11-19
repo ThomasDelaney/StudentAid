@@ -1,6 +1,7 @@
 package com.example.teohe.studentaid;
 
 import android.content.DialogInterface;
+import android.database.Cursor;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -71,13 +72,13 @@ public class SubmitMarkActivity extends AppCompatActivity
                 {
                     databaseManager.open();
 
-                    if (type == 1)
+                    if (type == 1 && !doesMarkExist(makrNameStr))
                     {
-                        addMark(markName.getText().toString());
+                        addMark(makrNameStr);
                     }
-                    else if (type == 2)
+                    else if (type == 2 && (makrNameStr.equals(getIntent().getExtras().getString("markName")) || !doesMarkExist(makrNameStr)))
                     {
-                        updateMark(getIntent().getExtras().getString("markName"), markName.getText().toString());
+                        updateMark(getIntent().getExtras().getString("markName"), makrNameStr);
                     }
 
                     databaseManager.close();
@@ -166,5 +167,23 @@ public class SubmitMarkActivity extends AppCompatActivity
 
         AlertDialog dialog = isMarkUpdatedAlert.create();
         dialog.show();
+    }
+
+    //checks if module already exists in database
+    private boolean doesMarkExist(String markName)
+    {
+        Cursor allMarks = databaseManager.getMarks(moduleName);
+
+        markName = markName.toLowerCase();
+
+        while(allMarks.moveToNext())
+        {
+            if (markName.equals(allMarks.getString(0).toLowerCase()))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

@@ -379,6 +379,88 @@ public class DatabaseManager
                 marksGet,  null, null, null, null, null);
     }
 
+    public long insertTimeslot(String moduleName, String classType,  String lecturerName, String room, int dayOfTheWeek, int slot) throws SQLException
+    {
+        long returnValue = -1;
+
+        try
+        {
+            ContentValues initialValues = new ContentValues();
+            initialValues.put(KEY_TIMESLOT_CLASS_TYPE, classType);
+            initialValues.put(KEY_LECTURER_NAME, lecturerName);
+            initialValues.put(KEY_TIMESLOT_ROOM, room);
+            initialValues.put(KEY_TIMESLOT_DAY_OF_THE_WEEK, dayOfTheWeek);
+            initialValues.put(KEY_TIMESLOT_SLOT, slot);
+            initialValues.put(KEY_MODULE_NAME, moduleName);
+
+            returnValue = db.insert(DATABASE_TIMESLOT_TABLE, null, initialValues);
+        }
+        catch (SQLException e)
+        {
+            Log.e("SQLException", e.getMessage());
+        }
+
+        return returnValue;
+    }
+
+    public long updateTimeslot(String moduleName, String classType,  String lecturerName, String room, int dayOfTheWeek, int slot) throws SQLException
+    {
+        long returnValue = -1;
+        String whereTimeslot = KEY_TIMESLOT_DAY_OF_THE_WEEK+" = "+dayOfTheWeek+" and "+KEY_TIMESLOT_SLOT+" = "+slot;
+
+        try
+        {
+            ContentValues initialValues = new ContentValues();
+            initialValues.put(KEY_TIMESLOT_CLASS_TYPE, classType);
+            initialValues.put(KEY_LECTURER_NAME, lecturerName);
+            initialValues.put(KEY_TIMESLOT_ROOM, room);
+            initialValues.put(KEY_TIMESLOT_DAY_OF_THE_WEEK, dayOfTheWeek);
+            initialValues.put(KEY_TIMESLOT_SLOT, slot);
+            initialValues.put(KEY_MODULE_NAME, moduleName);
+            returnValue = db.update(DATABASE_TIMESLOT_TABLE, initialValues, whereTimeslot, null);
+        }
+        catch (SQLException e)
+        {
+            Log.e("SQLException", e.getMessage());
+        }
+
+        return returnValue;
+    }
+
+    public long deleteTimeslot(int dayOfTheWeek, int slot) throws SQLException
+    {
+        long returnValue = -1;
+        String whereTimeslot = KEY_TIMESLOT_DAY_OF_THE_WEEK+" = "+dayOfTheWeek+" and "+KEY_TIMESLOT_SLOT+" = "+slot;
+
+        try
+        {
+            returnValue = db.delete(DATABASE_TIMESLOT_TABLE, whereTimeslot, new String[]{});
+        }
+        catch (SQLException e)
+        {
+            Log.e("SQLException", e.getMessage());
+        }
+
+        return returnValue;
+    }
+
+    public Cursor getTimeslots(int dayOfTheWeek)
+    {
+        long returnValue = -1;
+        String whereTimeslot = KEY_TIMESLOT_DAY_OF_THE_WEEK+" = "+dayOfTheWeek;
+
+        return db.query(true, DATABASE_TIMESLOT_TABLE, new String[]
+                        {
+                                KEY_MODULE_NAME,
+                                KEY_TIMESLOT_CLASS_TYPE,
+                                KEY_LECTURER_NAME,
+                                KEY_TIMESLOT_ROOM,
+                                KEY_TIMESLOT_DAY_OF_THE_WEEK,
+                                KEY_TIMESLOT_SLOT
+                        },
+                whereTimeslot,  null, null, null, null, null);
+    }
+
     // Reference: algorithm for getting file path from URI
     //https://stackoverflow.com/questions/3401579/get-filename-and-path-from-uri-from-mediastore
     public String getRealPathFromURI(Context context, Uri contentUri)

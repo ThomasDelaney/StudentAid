@@ -1,6 +1,7 @@
 package com.example.teohe.studentaid;
 
 import android.content.DialogInterface;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -51,13 +52,18 @@ public class SubmitModuleActivity extends AppCompatActivity
                 {
                     databaseManager.open();
 
-                    if (type == 1)
+                    if (type == 1 && !doesModuleExist(moduleNameStr))
                     {
-                        addModule(moduleName.getText().toString());
+                        addModule(moduleNameStr);
                     }
-                    else if (type == 2)
+                    //if updating and the current module name is the same as the module name OR the module name is not the same name as any other module, then update
+                    else if (type == 2 && (moduleNameStr.equals(getIntent().getExtras().getString("moduleName")) || !doesModuleExist(moduleNameStr)))
                     {
                         updateModule(getIntent().getExtras().getString("moduleName"), moduleNameStr);
+                    }
+                    else
+                    {
+                        Toast.makeText(getApplicationContext(), "Module Already Exists", Toast.LENGTH_SHORT).show();
                     }
 
                     databaseManager.close();
@@ -129,5 +135,23 @@ public class SubmitModuleActivity extends AppCompatActivity
 
         AlertDialog dialog = isModuleUpdatedAlert.create();
         dialog.show();
+    }
+
+    //checks if module already exists in database
+    private boolean doesModuleExist(String moduleName)
+    {
+        Cursor allModules = databaseManager.getModules();
+
+        moduleName = moduleName.toLowerCase();
+
+        while(allModules.moveToNext())
+        {
+            if (moduleName.equals(allModules.getString(0).toLowerCase()))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

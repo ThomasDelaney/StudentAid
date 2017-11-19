@@ -37,11 +37,15 @@ public class MarkListActivity extends AppCompatActivity
     ListView markListView;
     Module module;
 
-    //mode for what to do when modules are clicked
-    //0 if default mode (click to see marks)
+    //mode for what to do when marks are clicked
+    //0 if default mode
     //1 if edit mode (click to edit)
-    //2 if delete mode (2 to delete)
+    //2 if delete mode (click to delete)
+    //3 if list is empty
     int mode = 0;
+
+    //true if list is empty, false if not, used to make sure that a user cant edit or delete the 'empty row' which tells the user the list is empty
+    boolean empty = false;
 
     private class MarkAdapter extends ArrayAdapter<Mark>
     {
@@ -73,11 +77,15 @@ public class MarkListActivity extends AppCompatActivity
             {
                 markWorth.setText("");
                 markScore.setText("");
+                //set ems to 11 so the name fills up the screen rather than wraps at 6 ems normally
+                markName.setEms(11);
             }
             else
             {
                 markWorth.setText(Integer.toString(currentMark.getMarkWorth())+"%");
                 markScore.setText(Integer.toString(currentMark.getMarkScore())+"%");
+                //set ems to 6 so the name wraps once it reaches near the mark worth
+                markName.setEms(6);
             }
 
             return row;
@@ -123,11 +131,13 @@ public class MarkListActivity extends AppCompatActivity
         {
             //add CA as 101, which will be no way enterable by the user cause 100 will be the max, this is used to make the worth column text view empty
             Mark temp = new Mark(module, "Your Mark List is Empty! Click the Add Button to Add Some Marks", 101, 101);
+            empty = true;
             marks.add(temp);
             markListView.setAdapter(new MarkListActivity.MarkAdapter(MarkListActivity.this, R.layout.mark_row, marks));
         }
         else
         {
+            empty = false;
             markListView.setAdapter(new MarkListActivity.MarkAdapter(MarkListActivity.this, R.layout.mark_row, marks));
         }
 
@@ -138,7 +148,7 @@ public class MarkListActivity extends AppCompatActivity
             public void onItemClick(AdapterView<?> parent, final View view, final int position, long id)
             {
                 //if delete mode
-                if (mode == 2)
+                if (mode == 2 && !empty)
                 {
                     AlertDialog.Builder areYouSure = new AlertDialog.Builder(MarkListActivity.this);
                     areYouSure.setTitle("Are You Sure You Want to Delete This Mark?");
@@ -184,7 +194,7 @@ public class MarkListActivity extends AppCompatActivity
                     dialog.show();
                 }
                 //if edit mode
-                else if (mode == 1)
+                else if (mode == 1 && !empty)
                 {
                     AlertDialog.Builder areYouSure = new AlertDialog.Builder(MarkListActivity.this);
                     areYouSure.setTitle("Are You Sure You Want to Edit This Mark?");
@@ -241,11 +251,18 @@ public class MarkListActivity extends AppCompatActivity
         {
             // action with ID action_refresh was selected
             case R.id.menu_add:
-                Intent toAddMark = new Intent(MarkListActivity.this, SubmitMarkActivity.class);
-                toAddMark.putExtra("type", 1);
-                toAddMark.putExtra("moduleName", moduleName);
-                toAddMark.putExtra("moduleWorth", getRemainingCA());
-                startActivity(toAddMark);
+                if (getRemainingCA() != 0)
+                {
+                    Intent toAddMark = new Intent(MarkListActivity.this, SubmitMarkActivity.class);
+                    toAddMark.putExtra("type", 1);
+                    toAddMark.putExtra("moduleName", moduleName);
+                    toAddMark.putExtra("moduleWorth", getRemainingCA());
+                    startActivity(toAddMark);
+                }
+                else
+                {
+                    Toast.makeText(getApplicationContext(), "There is no Remaining CA to be Allocated", Toast.LENGTH_LONG).show();
+                }
                 break;
             case R.id.menu_edit:
                 //to change icon colours based on modes, while also changing modes
@@ -281,7 +298,7 @@ public class MarkListActivity extends AppCompatActivity
         return true;
     }
 
-    public void populateMarksFromCursor(Cursor c)
+    private void populateMarksFromCursor(Cursor c)
     {
         while(c.moveToNext())
         {
@@ -304,6 +321,7 @@ public class MarkListActivity extends AppCompatActivity
 
         for (Mark mark : marks)
         {
+            //if mark worth is 101 then we can skip because its only a placeholder key for identifying if there is no marks for the module
             if (mark.getMarkWorth() == 101)
             {
                 continue;

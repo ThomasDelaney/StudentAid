@@ -36,8 +36,11 @@ public class ModuleListActivity extends AppCompatActivity
     //mode for what to do when modules are clicked
     //0 if default mode (click to see marks)
     //1 if edit mode (click to edit)
-    //2 if delete mode (2 to delete)
+    //2 if delete mode (click to delete)
     int mode = 0;
+
+    //true if list is empty, false if not, used to make sure that a user cant edit or delete the 'empty row' which tells the user the list is empty
+    boolean empty = false;
 
     private class ModuleAdapter extends ArrayAdapter<Module>
     {
@@ -68,10 +71,14 @@ public class ModuleListActivity extends AppCompatActivity
             if (currentModule.getModuleWorth() == 101)
             {
                 moduleWorthStr = "";
+                //set ems to 11 so the name fills up the screen rather than wraps at 6 ems normally
+                moduleName.setEms(11);
             }
             else
             {
                 moduleWorthStr = Integer.toString(100 - currentModule.getModuleWorth()) + "/" + currentModule.getModuleWorth();
+                //set ems to 6 so the name wraps once it reaches near the module worth
+                moduleName.setEms(6);
             }
 
             moduleWorth.setText(moduleWorthStr);
@@ -91,7 +98,7 @@ public class ModuleListActivity extends AppCompatActivity
         navigation.setSelectedItemId(R.id.navigation_calculator);
 
         ActionBar actionBar = getSupportActionBar();
-        actionBar.setTitle("CA Calculator");
+        actionBar.setTitle("Module List");
         actionBar.show();
 
         moduleListView = (ListView)findViewById(R.id.moduleList);
@@ -111,11 +118,13 @@ public class ModuleListActivity extends AppCompatActivity
         {
             //add CA as 101, which will be no way enterable by the user cause 100 will be the max, this is used to make the worth column text view empty
             Module temp = new Module("Your Module List is Empty! Click the Add Button to Add Some Modules", 101);
+            empty = true;
             modules.add(temp);
             moduleListView.setAdapter(new ModuleAdapter (ModuleListActivity.this, R.layout.module_row, modules));
         }
         else
         {
+            empty = false;
             moduleListView.setAdapter(new ModuleAdapter(ModuleListActivity.this, R.layout.module_row, modules));
         }
 
@@ -126,7 +135,7 @@ public class ModuleListActivity extends AppCompatActivity
             public void onItemClick(AdapterView<?> parent, final View view, final int position, long id)
             {
                 //if delete mode
-                if (mode == 2)
+                if (mode == 2 && !empty)
                 {
                     AlertDialog.Builder areYouSure = new AlertDialog.Builder(ModuleListActivity.this);
                     areYouSure.setTitle("Are You Sure You Want to Delete This Module?");
@@ -172,7 +181,7 @@ public class ModuleListActivity extends AppCompatActivity
                     dialog.show();
                 }
                 //if edit mode
-                else if (mode == 1)
+                else if (mode == 1 && !empty)
                 {
                     AlertDialog.Builder areYouSure = new AlertDialog.Builder(ModuleListActivity.this);
                     areYouSure.setTitle("Are You Sure You Want to Edit This Module?");
@@ -285,6 +294,9 @@ public class ModuleListActivity extends AppCompatActivity
                 case R.id.navigation_calculator:
                     return true;
                 case R.id.navigation_timetables:
+                    Intent toTimetableIntent = new Intent(ModuleListActivity.this, TimetableActivity.class);
+                    startActivity(toTimetableIntent);
+                    finish();
                     return true;
                 case R.id.navigation_food:
                     return true;
@@ -295,7 +307,7 @@ public class ModuleListActivity extends AppCompatActivity
         }
     };
 
-    public void populateModulesFromCursor(Cursor c)
+    private void populateModulesFromCursor(Cursor c)
     {
         while(c.moveToNext())
         {

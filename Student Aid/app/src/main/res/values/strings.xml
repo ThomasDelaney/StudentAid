@@ -1,18 +1,19 @@
 <resources>
     <string name="app_name">Student Aid</string>
 
-    <string-array name="type_array">
+    <string-array name="classTypes">
         <item>Lecture</item>
         <item>Tutorial</item>
         <item>Lab</item>
     </string-array>
     <string name="title_activity_home">HomeActivity</string>
     <string name="title_home">Home</string>
-    <string name="title_calculator">CA Calculator</string>
+    <string name="title_calculator">Module List</string>
     <string name="title_timetables">Timetables</string>
     <string name="title_food">Food Map</string>
     <string name="title_notifications">Notifications</string>
     <string name="title_activity_module_list">ModuleListActivity</string>
     <string name="title_dashboard">Dashboard</string>
+    <string name="title_activity_timetable">TimetableActivity</string>
 
 </resources>

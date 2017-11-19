@@ -25,7 +25,11 @@
             android:label="@string/title_activity_module_list" />
         <activity android:name=".SubmitModuleActivity" />
         <activity android:name=".MarkListActivity" />
-        <activity android:name=".SubmitMarkActivity"></activity>
+        <activity android:name=".SubmitMarkActivity" />
+        <activity
+            android:name=".TimetableActivity"
+            android:label="@string/title_activity_timetable" />
+        <activity android:name=".SubmitTimeslotActivity"></activity>
     </application>
 
 </manifest>

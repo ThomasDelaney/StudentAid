@@ -36,6 +36,9 @@ public class HomeActivity extends AppCompatActivity
                     finish();
                     return true;
                 case R.id.navigation_timetables:
+                    Intent toTimetableIntent = new Intent(HomeActivity.this, TimetableActivity.class);
+                    startActivity(toTimetableIntent);
+                    finish();
                     return true;
                 case R.id.navigation_food:
                     return true;
