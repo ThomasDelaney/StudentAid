@@ -249,7 +249,7 @@ public class DatabaseManager
     public long updateModule(String originalModuleName, String newModuleName, int worth) throws SQLException
     {
         long returnValue = -1;
-        String moduleUpdate = "moduleName = "+"'"+originalModuleName+"'";
+        String moduleUpdate = KEY_MODULE_NAME+"= "+"'"+originalModuleName+"'";
         try
         {
             ContentValues initialValues = new ContentValues();
@@ -269,10 +269,24 @@ public class DatabaseManager
     public long deleteModule(String moduleName) throws SQLException
     {
         long returnValue = -1;
-        String moduleDelete = "moduleName = "+"'"+moduleName+"'";
+        String moduleDelete = KEY_MODULE_NAME+"= "+ "'"+moduleName+"'";
 
         try
         {
+            Cursor allMarks = getMarks(moduleName);
+
+            while(allMarks.moveToNext())
+            {
+                deleteMark(allMarks.getString(0));
+            }
+
+            Cursor allSlots = getModuleTimeslots(moduleName);
+
+            while(allSlots.moveToNext())
+            {
+                deleteTimeslot(allSlots.getInt(4), allSlots.getInt(5));
+            }
+
             returnValue = db.delete(DATABASE_MODULE_TABLE, moduleDelete, new String[]{});
         }
         catch (SQLException e)
@@ -295,7 +309,7 @@ public class DatabaseManager
 
     public Cursor getModule(String moduleName)
     {
-        String moduleSelect = "moduleName = "+"'"+moduleName+"'";
+        String moduleSelect = KEY_MODULE_NAME+"= "+ "'"+moduleName+"'";
 
         return db.query(true, DATABASE_MODULE_TABLE, new String[]
                         {
@@ -330,7 +344,7 @@ public class DatabaseManager
     public long updateMark(String originalMarkName, String newMarkName, int worth, int score) throws SQLException
     {
         long returnValue = -1;
-        String markUpdate = "markName = "+"'"+originalMarkName+"'";
+        String markUpdate = KEY_MARK_NAME+" = "+"'"+originalMarkName+"'";
         try
         {
             ContentValues initialValues = new ContentValues();
@@ -351,7 +365,7 @@ public class DatabaseManager
     public long deleteMark(String markName) throws SQLException
     {
         long returnValue = -1;
-        String markDelete = "markName = "+"'"+markName+"'";
+        String markDelete = KEY_MARK_NAME+" = "+"'"+markName+"'";
 
         try
         {
@@ -368,7 +382,7 @@ public class DatabaseManager
     public Cursor getMarks(String moduleName)
     {
         long returnValue = -1;
-        String marksGet = "moduleName = "+"'"+moduleName+"'";
+        String marksGet = KEY_MODULE_NAME+"= "+ "'"+moduleName+"'";
 
         return db.query(true, DATABASE_MARK_TABLE, new String[]
                         {
@@ -448,6 +462,24 @@ public class DatabaseManager
     {
         long returnValue = -1;
         String whereTimeslot = KEY_TIMESLOT_DAY_OF_THE_WEEK+" = "+dayOfTheWeek;
+
+        return db.query(true, DATABASE_TIMESLOT_TABLE, new String[]
+                        {
+                                KEY_MODULE_NAME,
+                                KEY_TIMESLOT_CLASS_TYPE,
+                                KEY_LECTURER_NAME,
+                                KEY_TIMESLOT_ROOM,
+                                KEY_TIMESLOT_DAY_OF_THE_WEEK,
+                                KEY_TIMESLOT_SLOT
+                        },
+                whereTimeslot,  null, null, null, null, null);
+    }
+
+    //private method to get all timeslots for a module, used for when you delete a module, all timslots depending on that module are deleted too
+    private Cursor getModuleTimeslots(String moduleName)
+    {
+        long returnValue = -1;
+        String whereTimeslot = KEY_MODULE_NAME+"= "+ "'"+moduleName+"'";
 
         return db.query(true, DATABASE_TIMESLOT_TABLE, new String[]
                         {

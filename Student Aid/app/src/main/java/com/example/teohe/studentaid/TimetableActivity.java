@@ -11,7 +11,6 @@ import android.support.design.widget.TabLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -35,7 +34,11 @@ public class TimetableActivity extends AppCompatActivity
     ArrayList<Timeslot> timeslots;
     DatabaseManager databaseManager;
 
+    private static final int SUBMIT_SLOT_CODE = 401;
+
     ListView timeslotList;
+
+    TabLayout tabLayout;
 
     //mode for what to do when timeslots are clicked
     //0 if default mode
@@ -106,7 +109,7 @@ public class TimetableActivity extends AppCompatActivity
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
         navigation.setSelectedItemId(R.id.navigation_timetables);
 
-        final TabLayout tabLayout = (TabLayout)findViewById(R.id.daysOfWeekTabs);
+        tabLayout = (TabLayout)findViewById(R.id.daysOfWeekTabs);
         tabLayout.addOnTabSelectedListener(onTabSelectedListener);
 
         ActionBar actionBar = getSupportActionBar();
@@ -121,7 +124,7 @@ public class TimetableActivity extends AppCompatActivity
 
         databaseManager.open();
         //since monday is default, we will get the timeslots for monday
-        final Cursor timeslotCursor = databaseManager.getTimeslots(0);
+        Cursor timeslotCursor = databaseManager.getTimeslots(0);
 
         //check if list is empty
         populateTimeslotsFromCursor(timeslotCursor);
@@ -136,8 +139,18 @@ public class TimetableActivity extends AppCompatActivity
             @Override
             public void onItemClick(AdapterView<?> parent, final View view, final int position, long id)
             {
+                boolean empty = true;
+
+                databaseManager.open();
+                Cursor modules = databaseManager.getModules();
+
+                if (modules.moveToFirst())
+                {
+                    empty = false;
+                }
+
                 //if delete mode and its not an empty timeslot, moduleName used for reference
-                if (mode == 2 && !timeslots.get(position).getModuleName().equals(""))
+                if (mode == 2 && !timeslots.get(position).getModuleName().equals("") && !empty)
                 {
                     //get current tab, for used in the alert message to get the tab text which is a day of the week e.g Monday
                     TabLayout.Tab currentTab = tabLayout.getTabAt(tabLayout.getSelectedTabPosition());
@@ -168,7 +181,7 @@ public class TimetableActivity extends AppCompatActivity
 
                                     mode = 0;
                                     toolbarMenu.getItem(2).setIcon(R.drawable.ic_delete_white_24dp); //change icon back to normal
-                                    recreate();
+                                    resetTimeslotListByDay(timeslots.get(rowPosition).getDayOfTheWeek());
                                 }
                             });
 
@@ -186,7 +199,7 @@ public class TimetableActivity extends AppCompatActivity
                     dialog.show();
                 }
                 //if edit mode and its not an empty timeslot, moduleName used for reference
-                else if (mode == 1 && !timeslots.get(position).getModuleName().equals(""))
+                else if (mode == 1 && !timeslots.get(position).getModuleName().equals("") && !empty)
                 {
                     //get current tab, for used in the alert message to get the tab text which is a day of the week e.g Monday, //final because it must be accessed by inner class and will not change
                     final TabLayout.Tab currentTab = tabLayout.getTabAt(tabLayout.getSelectedTabPosition());
@@ -207,7 +220,11 @@ public class TimetableActivity extends AppCompatActivity
                                     toUpdateTimeslotIntent.putExtra("dayString", currentTab.getText());
                                     toUpdateTimeslotIntent.putExtra("slotInt", timeslots.get(position).getSlot());
                                     toUpdateTimeslotIntent.putExtra("slotString", times[timeslots.get(position).getSlot()]);
-                                    startActivity(toUpdateTimeslotIntent);
+                                    toUpdateTimeslotIntent.putExtra("moduleName", timeslots.get(position).getModuleName());
+                                    toUpdateTimeslotIntent.putExtra("classType", timeslots.get(position).getClassType());
+                                    toUpdateTimeslotIntent.putExtra("lecturerName", timeslots.get(position).getLecturerName());
+                                    toUpdateTimeslotIntent.putExtra("room", timeslots.get(position).getRoom());
+                                    startActivityForResult(toUpdateTimeslotIntent, SUBMIT_SLOT_CODE);
                                 }
                             });
 
@@ -225,7 +242,7 @@ public class TimetableActivity extends AppCompatActivity
                     dialog.show();
                 }
                 //if add mode and IS an empty timeslot, moduleName used for reference
-                else if (mode == 3 && timeslots.get(position).getModuleName().equals(""))
+                else if (mode == 3 && timeslots.get(position).getModuleName().equals("") && !empty)
                 {
                     TabLayout.Tab currentTab = tabLayout.getTabAt(tabLayout.getSelectedTabPosition());
 
@@ -235,7 +252,11 @@ public class TimetableActivity extends AppCompatActivity
                     toAddTimeslotIntent.putExtra("dayString", currentTab.getText());
                     toAddTimeslotIntent.putExtra("slotInt", timeslots.get(position).getSlot());
                     toAddTimeslotIntent.putExtra("slotString", times[timeslots.get(position).getSlot()]);
-                    startActivity(toAddTimeslotIntent);
+                    startActivityForResult(toAddTimeslotIntent, SUBMIT_SLOT_CODE);
+                }
+                else if (empty)
+                {
+                    Toast.makeText(getApplicationContext(), "Your Module List is Empty! Please Add Modules Before Using Timetables", Toast.LENGTH_LONG).show();
                 }
             }
         });
@@ -359,7 +380,6 @@ public class TimetableActivity extends AppCompatActivity
     {
         while(c.moveToNext())
         {
-            Log.e("timeslot name", c.getString(0));
             Timeslot timeslot = new Timeslot(c.getString(0), c.getString(1), c.getString(2), c.getString(3), c.getInt(4), c.getInt(5));
             timeslots.add(timeslot);
         }
@@ -413,11 +433,18 @@ public class TimetableActivity extends AppCompatActivity
         timeslotList.setAdapter(new TimeslotAdapter(TimetableActivity.this, R.layout.timeslot_row, timeslots));
     }
 
-    @Override
-    protected void onRestart()
+    //used onActivityResult so that the user is brought back to the tab they were previously on
+    public void onActivityResult(int requestCode, int resultCode, Intent data)
     {
-        super.onRestart();
-        //will reload the activity
-        recreate();
+        if (requestCode == SUBMIT_SLOT_CODE)
+        {
+            if (resultCode == RESULT_OK)
+            {
+                TabLayout.Tab dayTab = tabLayout.getTabAt(data.getExtras().getInt("prevDay"));
+                dayTab.select();
+                resetTimeslotListByDay(dayTab.getPosition());
+
+            }
+        }
     }
 }

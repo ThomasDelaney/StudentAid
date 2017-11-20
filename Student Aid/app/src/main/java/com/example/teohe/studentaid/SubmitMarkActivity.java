@@ -50,12 +50,20 @@ public class SubmitMarkActivity extends AppCompatActivity
 
         submitButton = (Button)findViewById(R.id.submitMarkButton);
 
-        worthView.setText(worthBar.getProgress()+"/"+worthBar.getMax()+"% going towards the Remaining Continuous Assessment");
-        scoreView.setText("You Scored: "+scoreBar.getProgress()+"/"+scoreBar.getMax()+"%");
-
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle(moduleName);
         actionBar.show();
+
+        if (type == 2)
+        {
+            markName.setText(getIntent().getExtras().getString("markName"));
+
+            worthBar.setProgress(getIntent().getExtras().getInt("markWorth"));
+            scoreBar.setProgress(getIntent().getExtras().getInt("markScore"));
+        }
+
+        worthView.setText(worthBar.getProgress()+"/"+worthBar.getMax()+"% going towards the Remaining Continuous Assessment");
+        scoreView.setText("You Scored: "+scoreBar.getProgress()+"/"+scoreBar.getMax()+"%");
 
         submitButton.setOnClickListener(new View.OnClickListener()
         {

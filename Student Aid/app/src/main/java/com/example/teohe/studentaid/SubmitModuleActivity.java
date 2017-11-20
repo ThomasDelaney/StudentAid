@@ -35,6 +35,12 @@ public class SubmitModuleActivity extends AppCompatActivity
         worthView = (TextView)findViewById(R.id.seekBarWorth);
         submitButton = (Button)findViewById(R.id.submitModuleButton);
 
+        if (type == 2)
+        {
+            moduleName.setText(getIntent().getExtras().getString("moduleName"));
+            worthBar.setProgress(getIntent().getExtras().getInt("moduleWorth"));
+        }
+
         worthView.setText(worthBar.getProgress()+"/"+worthBar.getMax()+"% going towards Continuous Assessment");
 
         submitButton.setOnClickListener(new View.OnClickListener()

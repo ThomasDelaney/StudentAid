@@ -2,6 +2,7 @@ package com.example.teohe.studentaid;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
@@ -36,6 +37,9 @@ public class SubmitTimeslotActivity extends AppCompatActivity
     String slotString;
 
     ArrayList<String> moduleNames = new ArrayList<String>();
+
+    //int to store index of module name in module spinner (will only be used in edit mode)
+    int modulePosition;
 
     private class MouduleSpinnerAdapter extends ArrayAdapter<String>
     {
@@ -81,6 +85,7 @@ public class SubmitTimeslotActivity extends AppCompatActivity
 
         titleText.setText("Submit a Timeslot for "+slotString+" "+dayString);
 
+
         //get all the module names
         databaseManager.open();
         Cursor modules = databaseManager.getModules();
@@ -88,11 +93,40 @@ public class SubmitTimeslotActivity extends AppCompatActivity
         while(modules.moveToNext())
         {
             moduleNames.add(modules.getString(0));
+
+            if (type == 2 && modules.getString(0).equals(getIntent().getExtras().getString("moduleName")))
+            {
+                //since we're adding iteratively, the current index of the module position will be the size-1
+                modulePosition = moduleNames.size()-1;
+            }
         }
 
         databaseManager.close();
 
+        //if updating, set the input values to all the information they had already entered for that slot
+
         moduleSpinner.setAdapter(new MouduleSpinnerAdapter(getApplicationContext(), android.R.layout.simple_spinner_dropdown_item, moduleNames));
+
+        if (type == 2)
+        {
+            moduleSpinner.setSelection(modulePosition);
+
+            if (getIntent().getExtras().getString("classType").equals("Lecture"))
+            {
+                classTypeSpinner.setSelection(0);
+            }
+            else if (getIntent().getExtras().getString("classType").equals("Tutorial"))
+            {
+                classTypeSpinner.setSelection(1);
+            }
+            else
+            {
+                classTypeSpinner.setSelection(2);
+            }
+
+            lecturerName.setText(getIntent().getExtras().getString("lecturerName"));
+            room.setText(getIntent().getExtras().getString("room"));
+        }
 
         submitButton.setOnClickListener(new View.OnClickListener()
         {
@@ -131,8 +165,6 @@ public class SubmitTimeslotActivity extends AppCompatActivity
 
     private void addTimeslot(String moduleNameStr, String classTypeStr, String lecturerNameStr, String roomStr)
     {
-        Log.e("real shit?", moduleNameStr+ " "+classTypeStr+" "+lecturerNameStr+" "+roomStr+" "+Integer.toString(dayInt)+" "+Integer.toString(slotInt));
-
         long successValue = databaseManager.insertTimeslot(moduleNameStr, classTypeStr, lecturerNameStr, roomStr, dayInt, slotInt);
 
         AlertDialog.Builder isTimeSlotAddedAlert = new AlertDialog.Builder(SubmitTimeslotActivity.this);
@@ -147,6 +179,9 @@ public class SubmitTimeslotActivity extends AppCompatActivity
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.cancel();
+                        Intent backToTimeTables = new Intent();
+                        backToTimeTables.putExtra("prevDay", dayInt);
+                        setResult(RESULT_OK, backToTimeTables);
                         finish();
                     }
                 });
@@ -171,6 +206,9 @@ public class SubmitTimeslotActivity extends AppCompatActivity
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.cancel();
+                        Intent backToTimeTables = new Intent();
+                        backToTimeTables.putExtra("prevDay", dayInt);
+                        setResult(RESULT_OK, backToTimeTables);
                         finish();
                     }
                 });

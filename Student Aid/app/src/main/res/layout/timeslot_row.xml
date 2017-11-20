@@ -56,7 +56,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="12dp"
-        android:maxEms="6"
+        android:maxEms="5"
         android:text="Patricia O'Byrne"
         android:textSize="18sp"
         app:layout_constraintStart_toEndOf="@+id/classTypeRow"

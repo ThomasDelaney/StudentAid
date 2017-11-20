@@ -214,6 +214,8 @@ public class MarkListActivity extends AppCompatActivity
                                     toUpdateMarkIntent.putExtra("markName", marks.get(position).getMarkName());
                                     toUpdateMarkIntent.putExtra("moduleName", marks.get(position).getMarkModuleName());
                                     toUpdateMarkIntent.putExtra("moduleWorth", getRemainingCA()+marks.get(position).getMarkWorth());
+                                    toUpdateMarkIntent.putExtra("markWorth", marks.get(position).getMarkWorth());
+                                    toUpdateMarkIntent.putExtra("markScore", marks.get(position).getMarkScore());
                                     startActivity(toUpdateMarkIntent);
                                 }
                             });

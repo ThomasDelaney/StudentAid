@@ -196,6 +196,7 @@ public class ModuleListActivity extends AppCompatActivity
                                     Intent toUpdateModuleIntent = new Intent(ModuleListActivity.this, SubmitModuleActivity.class);
                                     toUpdateModuleIntent.putExtra("type", 2);
                                     toUpdateModuleIntent.putExtra("moduleName", modules.get(position).getModuleName());
+                                    toUpdateModuleIntent.putExtra("moduleWorth", modules.get(position).getModuleWorth());
                                     startActivity(toUpdateModuleIntent);
                                 }
                             });

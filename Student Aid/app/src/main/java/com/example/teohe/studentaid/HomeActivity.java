@@ -37,6 +37,7 @@ public class HomeActivity extends AppCompatActivity
                     return true;
                 case R.id.navigation_timetables:
                     Intent toTimetableIntent = new Intent(HomeActivity.this, TimetableActivity.class);
+                    toTimetableIntent.putExtra("prevDay", 0);
                     startActivity(toTimetableIntent);
                     finish();
                     return true;
